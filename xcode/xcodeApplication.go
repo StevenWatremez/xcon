@@ -4,6 +4,8 @@ import (
   "fmt"
   "os"
   "github.com/StevenWatremez/xcon/filesystem"
+  log "github.com/sirupsen/logrus"
+  plist "howett.net/plist"
 )
 
 type XcodeDetail struct {
@@ -20,12 +22,52 @@ func fetchPath(application string) string {
   }
 }
 
+type versionPlist struct {
+  Version string `plist:"CFBundleShortVersionString"`
+}
+
 func fetchVersion(path string) string {
-  return "9.0"
+  filename := path + "/version.plist"
+  xmlFile, err := os.Open(filename)
+  if err != nil {
+    log.Warnf("plist: error opening plist: %s", err)
+    return ""
+  }
+  defer xmlFile.Close()
+
+  var data versionPlist
+  decoder := plist.NewDecoder(xmlFile)
+  errDecode := decoder.Decode(&data)
+  if errDecode != nil {
+    log.Warn(errDecode)
+    return ""
+  }
+  log.Infof("xcode version : %s", data.Version)
+  return data.Version
+}
+
+type infoPlist struct {
+  Icon string `plist:"CFBundleIconFile"`
 }
 
 func fetchIconName(path string) string {
-  return "Xcode"
+  filename := path + "/Info.plist"
+  xmlFile, err := os.Open(filename)
+  if err != nil {
+    log.Warnf("plist: error opening plist: %s", err)
+    return ""
+  }
+  defer xmlFile.Close()
+
+  var data infoPlist
+  decoder := plist.NewDecoder(xmlFile)
+  errDecode := decoder.Decode(&data)
+  if errDecode != nil {
+    log.Warn(errDecode)
+    return ""
+  }
+  log.Infof("xcode icon name : %s", data.Icon)
+  return data.Icon
 }
 
 func ParseXcodeApplication(application, xcodeVersion string) XcodeDetail {

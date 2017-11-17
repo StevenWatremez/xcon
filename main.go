@@ -7,7 +7,7 @@ import (
   log "github.com/sirupsen/logrus"
 
   "github.com/StevenWatremez/xcon/xcode"
-  "github.com/StevenWatremez/xcon/processing"
+  //"github.com/StevenWatremez/xcon/processing"
 )
 
 func main() {
@@ -50,12 +50,6 @@ func main() {
     os.Exit(1)
   }
 
-  fmt.Println(`
-   |\  —————————————————————————————————————————————————————————————————  /|
-   | |                            Welcome To xcon                        | |
-   |/  —————————————————————————————————————————————————————————————————  \|
-  `)
-
   // Check which subcommand was Parsed using the FlagSet.Parsed() function. Handle each case accordingly.
   // FlagSet.Parse() will evaluate to false if no flags were parsed (i.e. the user did not provide any flags)
   if autoCommand.Parsed() {
@@ -69,6 +63,8 @@ func main() {
     }
 
     fmt.Printf(`---------------------------------------------------------------
+                      Welcome to xcon
+---------------------------------------------------------------
       application: '%s' 
       template: '%s'
       xcode-version: '%s'
@@ -80,23 +76,25 @@ func main() {
 
     log.Warn("under construct.")
     xcode := xcapp.ParseXcodeApplication(*targetApplicationPtr, *targetXCodeVersionPtr)
-
-    data, err := Asset("template-" + *targetTemplatePtr + ".png")
-    if err != nil {
-      // Asset was not found.
-      fmt.Println("Asset was not found !")
-      os.Exit(1)
-    }
+    log.Info(xcode)
     
-    //
-    templateImage := proc.ProcessTemplate(data, xcode.Version)
+    // data, err := Asset("template-" + *targetTemplatePtr + ".png")
+    // if err != nil {
+    //   // Asset was not found.
+    //   fmt.Println("Asset was not found !")
+    //   os.Exit(1)
+    // }
+    
+    // //
+    // templateImage := proc.ProcessTemplate(data, xcode.Version)
 
-    iconFileName := "/" + xcode.IconName + ".icns"
-    rootPathIcns := xcode.RootPath + iconFileName
-    resourcesPathIcns := xcode.ResourcesPath + iconFileName
+    // iconFileName := "/" + xcode.IconName + ".icns"
+    // rootPathIcns := xcode.RootPath + iconFileName
+    // resourcesPathIcns := xcode.ResourcesPath + iconFileName
     //"/Users/swatremez/Desktop/test.icns"
-    proc.CreateIcns(templateImage, rootPathIcns)
-    proc.CreateIcns(templateImage, resourcesPathIcns)
+    // TODO : decomment these lines
+    //proc.CreateIcns(templateImage, rootPathIcns)
+    //proc.CreateIcns(templateImage, resourcesPathIcns)
     
     log.Info("Xcode detail: ", xcode)
   }
